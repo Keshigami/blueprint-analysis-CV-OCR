@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blueprint Analysis AI</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent: #38bdf8;
+            --accent-hover: #0ea5e9;
+            --border: #334155;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        header {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--border);
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 600;
+            letter-spacing: -0.025em;
+        }
+
+        .badge {
+            background: rgba(56, 189, 248, 0.1);
+            color: var(--accent);
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            border: 1px solid rgba(56, 189, 248, 0.2);
+        }
+
+        .controls {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .toggle-btn {
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            color: var(--accent);
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .toggle-btn:hover {
+            background: rgba(56, 189, 248, 0.2);
+        }
+
+        .toggle-btn.active {
+            background: var(--accent);
+            color: var(--bg-color);
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            padding: 2rem;
+            gap: 2rem;
+            overflow: hidden;
+        }
+
+        .upload-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-width: 400px;
+        }
+
+        .drop-zone {
+            border: 2px dashed var(--border);
+            border-radius: 1rem;
+            padding: 3rem 2rem;
+            text-align: center;
+            transition: all 0.2s;
+            cursor: pointer;
+            background: var(--card-bg);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .drop-zone:hover,
+        .drop-zone.dragover {
+            border-color: var(--accent);
+            background: rgba(56, 189, 248, 0.05);
+        }
+
+        .drop-zone svg {
+            width: 48px;
+            height: 48px;
+            color: var(--text-secondary);
+        }
+
+        .drop-zone p {
+            margin: 0;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .drop-zone span {
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        .results-panel {
+            flex: 1;
+            background: var(--card-bg);
+            border-radius: 1rem;
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .canvas-container {
+            flex: 1;
+            background: #000;
+            position: relative;
+            overflow: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        canvas {
+            max-width: 100%;
+            max-height: 100%;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .sidebar {
+            width: 300px;
+            background: var(--card-bg);
+            border-left: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .sidebar-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+
+        .result-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            margin-bottom: 0.75rem;
+            transition: all 0.2s;
+        }
+
+        .result-item:hover {
+            border-color: var(--accent);
+            background: rgba(56, 189, 248, 0.05);
+        }
+
+        .result-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .result-conf {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .conf-bar {
+            height: 4px;
+            background: rgba(56, 189, 248, 0.2);
+            border-radius: 2px;
+            margin-top: 0.5rem;
+            overflow: hidden;
+        }
+
+        .conf-fill {
+            height: 100%;
+            background: var(--accent);
+            transition: width 0.3s;
+        }
+
+        .loading-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(56, 189, 248, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--accent);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-box {
+            background: rgba(56, 189, 248, 0.1);
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent);">
+                <path d="M2 22h20"></path>
+                <path d="M2 2h20"></path>
+                <path d="M2 2v20"></path>
+                <path d="M22 2v20"></path>
+                <path d="M12 2v20"></path>
+                <path d="M2 12h20"></path>
+                <path d="M7 7h.01"></path>
+                <path d="M17 17h.01"></path>
+                <path d="M7 17h.01"></path>
+                <path d="M17 7h.01"></path>
+            </svg>
+            <h1>Blueprint Analysis AI</h1>
+        </div>
+        <div class="controls">
+            <button class="toggle-btn active" id="toggleOCR">OCR</button>
+            <button class="toggle-btn" id="toggleSAM2">SAM2</button>
+            <span class="badge">v2.0.0</span>
+        </div>
+    </header>
+
+    <main>
+        <div class="upload-section">
+            <div class="drop-zone" id="dropZone">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+                <p><span>Click to upload</span> or drag and drop</p>
+                <p style="font-size: 0.75rem;">Supports JPG, PNG (Max 10MB)</p>
+                <input type="file" id="fileInput" accept="image/*">
+            </div>
+
+            <div class="sidebar" style="width: 100%; border: 1px solid var(--border); border-radius: 1rem;">
+                <div class="sidebar-header">Analysis Results</div>
+                <div class="sidebar-content" id="resultsList">
+                    <p style="color: var(--text-secondary); text-align: center; margin-top: 2rem;">Upload a blueprint to
+                        see results.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="results-panel">
+            <div class="loading-overlay" id="loading">
+                <div class="spinner"></div>
+                <p id="loadingText" style="color: var(--text-secondary);">Processing...</p>
+            </div>
+            <div class="canvas-container">
+                <canvas id="resultCanvas"></canvas>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const canvas = document.getElementById('resultCanvas');
+        const ctx = canvas.getContext('2d');
+        const resultsList = document.getElementById('resultsList');
+        const loading = document.getElementById('loading');
+        const loadingText = document.getElementById('loadingText');
+        const toggleOCR = document.getElementById('toggleOCR');
+        const toggleSAM2 = document.getElementById('toggleSAM2');
+
+        let currentMode = 'ocr';
+        let currentImage = null;
+        let currentData = null;
+
+        // Toggle modes
+        toggleOCR.addEventListener('click', () => {
+            currentMode = 'ocr';
+            toggleOCR.classList.add('active');
+            toggleSAM2.classList.remove('active');
+            if (currentImage && currentData) {
+                renderVisualization();
+            }
+        });
+
+        toggleSAM2.addEventListener('click', () => {
+            currentMode = 'sam2';
+            toggleSAM2.classList.add('active');
+            toggleOCR.classList.remove('active');
+            if (currentImage && currentData) {
+                renderVisualization();
+            }
+        });
+
+        // Drag & Drop handlers
+        dropZone.addEventListener('click', () => fileInput.click());
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            if (e.dataTransfer.files.length) {
+                handleFile(e.dataTransfer.files[0]);
+            }
+        });
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        async function handleFile(file) {
+            loading.style.display = 'flex';
+            loadingText.textContent = 'Loading image...';
+            resultsList.innerHTML = '';
+            currentData = null;
+
+            // Load image
+            const img = new Image();
+            img.onload = async () => {
+                currentImage = img;
+                canvas.width = img.width;
+                canvas.height = img.height;
+                ctx.drawImage(img, 0, 0);
+
+                // Fetch analysis
+                loadingText.textContent = 'Analyzing blueprint...';
+                await fetchAnalysis(file);
+            };
+            img.src = URL.createObjectURL(file);
+        }
+
+        async function fetchAnalysis(file) {
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch('/analyze_complete', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) throw new Error('Analysis failed');
+
+                currentData = await response.json();
+                renderVisualization();
+                updateSidebar();
+
+            } catch (error) {
+                console.error(error);
+                loadingText.textContent = 'Error processing image. OCR-only mode.';
+                // Fallback to OCR only
+                try {
+                    const response = await fetch('/analyze', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const data = await response.json();
+                    currentData = { ocr_results: data.ocr_results };
+                    renderVisualization();
+                    updateSidebar();
+                } catch (e2) {
+                    alert('Error processing image');
+                }
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+
+        function renderVisualization() {
+            if (!currentImage || !currentData) return;
+
+            // Redraw base image
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(currentImage, 0, 0);
+
+            if (currentMode === 'ocr') {
+                drawOCRResults(currentData.ocr_results);
+            } else if (currentMode === 'sam2') {
+                drawSAM2Results(currentData.segmentation);
+            }
+        }
+
+        function drawOCRResults(results) {
+            if (!results || results.length === 0) return;
+
+            ctx.lineWidth = 3;
+            ctx.font = 'bold 16px Inter, sans-serif';
+
+            results.forEach(item => {
+                const box = item.box;
+                const conf = item.confidence;
+
+                // Color based on confidence
+                const hue = conf * 120; // 0-120 (red to green)
+                ctx.strokeStyle = `hsl(${hue}, 80%, 60%)`;
+
+                // Draw Box
+                ctx.beginPath();
+                ctx.moveTo(box[0][0], box[0][1]);
+                ctx.lineTo(box[1][0], box[1][1]);
+                ctx.lineTo(box[2][0], box[2][1]);
+                ctx.lineTo(box[3][0], box[3][1]);
+                ctx.closePath();
+                ctx.stroke();
+
+                // Draw Background for Text
+                const text = item.text;
+                const textWidth = ctx.measureText(text).width;
+                ctx.fillStyle = 'rgba(15, 23, 42, 0.9)';
+                ctx.fillRect(box[0][0], box[0][1] - 25, textWidth + 10, 25);
+
+                // Draw Text
+                ctx.fillStyle = `hsl(${hue}, 80%, 70%)`;
+                ctx.fillText(text, box[0][0] + 5, box[0][1] - 7);
+            });
+        }
+
+        function drawSAM2Results(segmentation) {
+            if (!segmentation || !segmentation.masks || segmentation.masks.length === 0) return;
+
+            const masks = segmentation.masks;
+
+            // Draw bounding boxes for masks
+            masks.forEach((mask, idx) => {
+                const [x, y, w, h] = mask.bbox;
+                const conf = mask.predicted_iou;
+
+                // Color based on confidence
+                const hue = conf * 120;
+                const alpha = 0.3 + (conf * 0.4); // 0.3-0.7
+
+                // Fill
+                ctx.fillStyle = `hsla(${hue}, 70%, 50%, ${alpha * 0.3})`;
+                ctx.fillRect(x, y, w, h);
+
+                // Border
+                ctx.strokeStyle = `hsl(${hue}, 70%, 60%)`;
+                ctx.lineWidth = 2;
+                ctx.strokeRect(x, y, w, h);
+
+                // Label
+                if (idx < 20) { // Only label first 20
+                    ctx.fillStyle = 'rgba(15, 23, 42, 0.8)';
+                    ctx.fillRect(x, y - 22, 60, 20);
+                    ctx.fillStyle = `hsl(${hue}, 70%, 70%)`;
+                    ctx.font = '12px Inter';
+                    ctx.fillText(`#${idx + 1} ${(conf * 100).toFixed(0)}%`, x + 3, y - 8);
+                }
+            });
+        }
+
+        function updateSidebar() {
+            if (!currentData) return;
+
+            let html = '';
+
+            // Stats
+            const numOCR = currentData.ocr_results ? currentData.ocr_results.length : 0;
+            const numMasks = currentData.segmentation ? currentData.segmentation.num_masks : 0;
+
+            html += `<div class="stats">
+            <div class="stat-box">
+                <div class="stat-value">${numOCR}</div>
+                <div class="stat-label">Text Regions</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value">${numMasks}</div>
+                <div class="stat-label">Segments</div>
+            </div>
+        </div>`;
+
+            // Results based on mode
+            if (currentMode === 'ocr' && currentData.ocr_results) {
+                html += currentData.ocr_results.slice(0, 20).map(item => `
+                <div class="result-item">
+                    <div class="result-label">${item.text}</div>
+                    <div class="result-conf">Confidence: ${(item.confidence * 100).toFixed(1)}%</div>
+                    <div class="conf-bar">
+                        <div class="conf-fill" style="width: ${item.confidence * 100}%"></div>
+                    </div>
+                </div>
+            `).join('');
+            } else if (currentMode === 'sam2' && currentData.segmentation && currentData.segmentation.masks) {
+                html += currentData.segmentation.masks.slice(0, 20).map((mask, idx) => `
+                <div class="result-item">
+                    <div class="result-label">Segment #${idx + 1}</div>
+                    <div class="result-conf">
+                        Area: ${mask.area.toLocaleString()}px²<br>
+                        Quality: ${(mask.predicted_iou * 100).toFixed(1)}%
+                    </div>
+                    <div class="conf-bar">
+                        <div class="conf-fill" style="width: ${mask.predicted_iou * 100}%"></div>
+                    </div>
+                </div>
+            `).join('');
+            }
+
+            resultsList.innerHTML = html || '<p style="color: var(--text-secondary); text-align: center;">No results available.</p>';
+        }
+    </script>
+
+</body>
+
+</html>
