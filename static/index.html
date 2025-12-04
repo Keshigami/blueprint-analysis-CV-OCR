@@ -472,8 +472,18 @@
         function drawOCRResults(results) {
             if (!results || results.length === 0) return;
 
-            ctx.lineWidth = 3;
-            ctx.font = 'bold 16px Inter, sans-serif';
+            // Safety check for image
+            if (!currentImage || !currentImage.naturalWidth || !currentImage.naturalHeight) {
+                console.error('Image not loaded for OCR visualization');
+                return;
+            }
+
+            // Get scaling factors between original image and canvas
+            const scaleX = canvas.width / currentImage.naturalWidth;
+            const scaleY = canvas.height / currentImage.naturalHeight;
+
+            ctx.lineWidth = 2;
+            ctx.font = 'bold 14px Inter, sans-serif';
 
             results.forEach(item => {
                 const box = item.box;
@@ -483,59 +493,122 @@
                 const hue = conf * 120; // 0-120 (red to green)
                 ctx.strokeStyle = `hsl(${hue}, 80%, 60%)`;
 
-                // Draw Box
+                // Draw Box with proper scaling
                 ctx.beginPath();
-                ctx.moveTo(box[0][0], box[0][1]);
-                ctx.lineTo(box[1][0], box[1][1]);
-                ctx.lineTo(box[2][0], box[2][1]);
-                ctx.lineTo(box[3][0], box[3][1]);
+                ctx.moveTo(box[0][0] * scaleX, box[0][1] * scaleY);
+                ctx.lineTo(box[1][0] * scaleX, box[1][1] * scaleY);
+                ctx.lineTo(box[2][0] * scaleX, box[2][1] * scaleY);
+                ctx.lineTo(box[3][0] * scaleX, box[3][1] * scaleY);
                 ctx.closePath();
                 ctx.stroke();
 
-                // Draw Background for Text
+                // Create descriptive label
                 const text = item.text;
-                const textWidth = ctx.measureText(text).width;
-                ctx.fillStyle = 'rgba(15, 23, 42, 0.9)';
-                ctx.fillRect(box[0][0], box[0][1] - 25, textWidth + 10, 25);
+                const confidence = item.confidence;
+                const label = `${text} (${(confidence * 100).toFixed(0)}% confidence)`;
 
-                // Draw Text
+                // Calculate position
+                const x = box[0][0] * scaleX;
+                const y = box[0][1] * scaleY;
+
+                // Measure text for background
+                const textMetrics = ctx.measureText(label);
+                const textWidth = textMetrics.width;
+                const padding = 8;
+                const labelHeight = 22;
+
+                // Draw label background
+                ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+                ctx.fillRect(x, y - labelHeight - 4, textWidth + padding * 2, labelHeight);
+
+                // Draw label text
                 ctx.fillStyle = `hsl(${hue}, 80%, 70%)`;
-                ctx.fillText(text, box[0][0] + 5, box[0][1] - 7);
+                ctx.fillText(label, x + padding, y - 8);
             });
         }
 
         function drawSAM2Results(segmentation) {
-            if (!segmentation || !segmentation.masks || segmentation.masks.length === 0) return;
+            console.log('drawSAM2Results called with:', segmentation);
+
+            if (!segmentation) {
+                console.warn('No segmentation data');
+                return;
+            }
 
             const masks = segmentation.masks;
 
-            // Draw bounding boxes for masks
-            masks.forEach((mask, idx) => {
-                const [x, y, w, h] = mask.bbox;
-                const conf = mask.predicted_iou;
+            if (!masks || masks.length === 0) {
+                console.warn('No masks in segmentation data');
+                ctx.fillStyle = 'rgba(56, 189, 248, 0.8)';
+                ctx.font = '20px Inter';
+                ctx.fillText('No segments detected.', 50, 50);
+                return;
+            }
 
-                // Color based on confidence
-                const hue = conf * 120;
-                const alpha = 0.3 + (conf * 0.4); // 0.3-0.7
-
-                // Fill
-                ctx.fillStyle = `hsla(${hue}, 70%, 50%, ${alpha * 0.3})`;
-                ctx.fillRect(x, y, w, h);
-
-                // Border
-                ctx.strokeStyle = `hsl(${hue}, 70%, 60%)`;
-                ctx.lineWidth = 2;
-                ctx.strokeRect(x, y, w, h);
-
-                // Label
-                if (idx < 20) { // Only label first 20
-                    ctx.fillStyle = 'rgba(15, 23, 42, 0.8)';
-                    ctx.fillRect(x, y - 22, 60, 20);
-                    ctx.fillStyle = `hsl(${hue}, 70%, 70%)`;
-                    ctx.font = '12px Inter';
-                    ctx.fillText(`#${idx + 1} ${(conf * 100).toFixed(0)}%`, x + 3, y - 8);
+            try {
+                // Ensure image is loaded for scaling
+                if (!currentImage || !currentImage.naturalWidth) {
+                    console.error('Image not loaded for scaling');
+                    return;
                 }
-            });
+
+                console.log(`Drawing ${masks.length} SAM2 masks`);
+
+                // Get scaling factors
+                const scaleX = canvas.width / currentImage.naturalWidth;
+                const scaleY = canvas.height / currentImage.naturalHeight;
+
+                if (!Number.isFinite(scaleX) || !Number.isFinite(scaleY)) {
+                    console.error('Invalid scaling factors:', scaleX, scaleY);
+                    return;
+                }
+
+                // Draw bounding boxes for masks
+                masks.forEach((mask, idx) => {
+                    const [x, y, w, h] = mask.bbox;
+                    const conf = mask.predicted_iou;
+
+                    // Color based on confidence
+                    const hue = conf * 120;
+                    const alpha = 0.3 + (conf * 0.4); // 0.3-0.7
+
+                    // Fill (semi-transparent) with scaling
+                    ctx.fillStyle = `hsla(${hue}, 70%, 50%, ${alpha * 0.2})`;
+                    ctx.fillRect(x * scaleX, y * scaleY, w * scaleX, h * scaleY);
+
+                    // Border (more visible) with scaling
+                    ctx.strokeStyle = `hsl(${hue}, 70%, 60%)`;
+                    ctx.lineWidth = 3;
+                    ctx.strokeRect(x * scaleX, y * scaleY, w * scaleX, h * scaleY);
+
+                    // Label with natural language (first 30 for clarity)
+                    if (idx < 30) {
+                        const regionNumber = idx + 1;
+                        const confidencePercent = (conf * 100).toFixed(0);
+                        const areaPixels = mask.area;
+                        const label = `Region ${regionNumber}: ${confidencePercent}% confidence`;
+
+                        // Position label at top of bounding box
+                        const labelX = x * scaleX;
+                        const labelY = y * scaleY;
+
+                        // Measure and draw background
+                        ctx.font = 'bold 12px Inter';
+                        const textWidth = ctx.measureText(label).width;
+                        ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+                        ctx.fillRect(labelX, labelY - 20, textWidth + 12, 18);
+
+                        // Draw label text
+                        ctx.fillStyle = `hsl(${hue}, 90%, 70%)`;
+                        ctx.fillText(label, labelX + 6, labelY - 6);
+                    }
+                });
+            } catch (e) {
+                console.error('Error drawing SAM2 results:', e);
+                ctx.fillStyle = 'red';
+                ctx.fillText('Error drawing segments', 50, 50);
+            }
+            console.log('SAM2 visualization complete');
         }
 
         function updateSidebar() {

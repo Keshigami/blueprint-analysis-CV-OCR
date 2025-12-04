@@ -138,7 +138,7 @@ if __name__ == "__main__":
         segmenter = SAM2Segmenter(device="cpu")
         
         # Test on a real floor plan
-        test_images = glob.glob("../real_data/images/*.jpg")[:1]
+        test_images = glob.glob("english_data/floorplan_cad/images/*.jpg")[:1]
         
         if test_images:
             img_path = test_images[0]

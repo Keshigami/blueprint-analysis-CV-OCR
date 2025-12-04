@@ -71,6 +71,78 @@ curl -L -o sam2.1_hiera_tiny.pt \
   https://dl.fbaipublicfiles.com/segment_anything_2/092824/sam2.1_hiera_tiny.pt
 ```
 
+## Dataset Credits & Citations
+
+### Primary Dataset
+
+**FloorPlanCAD** - English Architectural Floor Plans
+
+- **Source**: Voxel51/FloorPlanCAD via Hugging Face Datasets
+- **License**: Apache 2.0
+- **Citation**:
+
+  ```bibtex
+  @misc{floorplancad2024,
+    title={FloorPlanCAD: English Architectural Floor Plan Dataset},
+    author={Voxel51},
+    year={2024},
+    url={https://huggingface.co/datasets/Voxel51/FloorPlanCAD}
+  }
+  ```
+
+- **Usage**: 200 professional CAD floor plans for classification and OCR training
+- **Location**: `english_data/floorplan_cad/images/`
+
+### Additional Dataset Resources
+
+For expanded training, the following datasets are referenced:
+
+**WAFFLE** - Real Scanned Floor Plans (Manual Download)
+
+- **Paper**: "WAFFLE: Multi-Modal Model for Automated Front-end Modeling" (WACV 2025)
+- **Authors**: Elor et al., Tel Aviv University
+- **Size**: ~20,000 real photographed/scanned floor plans
+- **URL**: <https://github.com/TAU-VAILab/WAFFLE>
+
+**MSD** - Swiss Building Plans
+
+- **Source**: Swiss Federal Office of Topography
+- **Size**: 5,400 floor plans
+- **Platform**: Kaggle
+
+**CVC-FP** - Scanned Floor Plans
+
+- **Authors**: Computer Vision Center, Barcelona
+- **Size**: 122 scanned documents
+- **Type**: Real-world scanned architectural documents
+
+## Acknowledgments
+
+### Frameworks & Libraries
+
+- **[PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR)** - Text detection and recognition engine
+  - License: Apache 2.0
+  - Citation: PaddlePaddle Team
+  
+- **[SAM2](https://github.com/facebookresearch/segment-anything-2)** - Segment Anything Model 2
+  - License: Apache 2.0
+  - Authors: Meta AI Research
+  - Paper: "Segment Anything 2" (2024)
+  
+- **[PyTorch](https://pytorch.org/)** - Deep learning framework
+  - License: BSD-3-Clause
+  
+- **[FastAPI](https://fastapi.tiangolo.com/)** - Modern web framework
+  - License: MIT
+  
+- **[OpenCV](https://opencv.org/)** - Computer vision library
+  - License: Apache 2.0
+
+### Model Architectures
+
+- **EfficientNet-B3**: Tan & Le, "EfficientNet: Rethinking Model Scaling for CNNs" (ICML 2019)
+- **ResNet18**: He et al., "Deep Residual Learning for Image Recognition" (CVPR 2016)
+
 ### Run the Demo
 
 ```bash

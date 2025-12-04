@@ -1,0 +1,259 @@
+{
+  "test_images": 20,
+  "models": {
+    "enhanced": {
+      "architecture": "EfficientNet-B3",
+      "avg_confidence": 0.9818671315908432,
+      "avg_inference_time_ms": 686.5278482437134,
+      "results": [
+        {
+          "image": "floorplan_0189.jpg",
+          "prediction": "floorplan",
+          "confidence": 0.9865260720252991,
+          "inference_time": 0.7677879333496094
+        },
+        {
+          "image": "floorplan_0162.jpg",
+          "prediction": "floorplan",
+          "confidence": 0.9944397211074829,
+          "inference_time": 0.740487813949585
+        },
+        {
+          "image": "floorplan_0176.jpg",
+          "prediction": "floorplan",
+          "confidence": 0.9566066265106201,
+          "inference_time": 0.7410798072814941
+        },
+        {
+          "image": "floorplan_0016.jpg",
+          "prediction": "floorplan",
+          "confidence": 0.979168713092804,
+          "inference_time": 0.7435059547424316
+        },
+        {
+          "image": "floorplan_0002.jpg",
+          "prediction": "floorplan",
+          "confidence": 0.9868183135986328,
+          "inference_time": 0.7232100963592529
+        },
+        {
+          "image": "floorplan_0003.jpg",
+          "prediction": "floorplan",
+          "confidence": 0.97713702917099,
+          "inference_time": 0.7218570709228516
+        },
+        {
+          "image": "floorplan_0017.jpg",
+          "prediction": "floorplan",
+          "confidence": 0.993958592414856,
+          "inference_time": 0.7201409339904785
+        },
+        {
+          "image": "floorplan_0177.jpg",
+          "prediction": "floorplan",
+          "confidence": 0.963376522064209,
+          "inference_time": 0.7163310050964355
+        },
+        {
+          "image": "floorplan_0163.jpg",
+          "prediction": "floorplan",
+          "confidence": 0.9785277247428894,
+          "inference_time": 0.7247130870819092
+        },
+        {
+          "image": "floorplan_0188.jpg",
+          "prediction": "floorplan",
+          "confidence": 0.9919044971466064,
+          "inference_time": 0.7359790802001953
+        },
+        {
+          "image": "floorplan_0149.jpg",
+          "prediction": "floorplan",
+          "confidence": 0.9499651193618774,
+          "inference_time": 0.7391109466552734
+        },
+        {
+          "image": "floorplan_0175.jpg",
+          "prediction": "floorplan",
+          "confidence": 0.9655206203460693,
+          "inference_time": 0.8056340217590332
+        },
+        {
+          "image": "floorplan_0161.jpg",
+          "prediction": "floorplan",
+          "confidence": 0.9840680956840515,
+          "inference_time": 0.6788761615753174
+        },
+        {
+          "image": "floorplan_0029.jpg",
+          "prediction": "floorplan",
+          "confidence": 0.9918680787086487,
+          "inference_time": 0.6483941078186035
+        },
+        {
+          "image": "floorplan_0001.jpg",
+          "prediction": "floorplan",
+          "confidence": 0.994382381439209,
+          "inference_time": 0.6306262016296387
+        },
+        {
+          "image": "floorplan_0015.jpg",
+          "prediction": "floorplan",
+          "confidence": 0.9977300763130188,
+          "inference_time": 0.6074938774108887
+        },
+        {
+          "image": "floorplan_0014.jpg",
+          "prediction": "floorplan",
+          "confidence": 0.9779627919197083,
+          "inference_time": 0.5695018768310547
+        },
+        {
+          "image": "floorplan_0000.jpg",
+          "prediction": "floorplan",
+          "confidence": 0.9804227948188782,
+          "inference_time": 0.5692741870880127
+        },
+        {
+          "image": "floorplan_0028.jpg",
+          "prediction": "floorplan",
+          "confidence": 0.9904531240463257,
+          "inference_time": 0.5942630767822266
+        },
+        {
+          "image": "floorplan_0160.jpg",
+          "prediction": "floorplan",
+          "confidence": 0.9965057373046875,
+          "inference_time": 0.5522897243499756
+        }
+      ]
+    },
+    "baseline": {
+      "architecture": "ResNet18",
+      "avg_confidence": 0.9782506644725799,
+      "avg_inference_time_ms": 7.156109809875488,
+      "results": [
+        {
+          "image": "floorplan_0189.jpg",
+          "prediction": "floorplan",
+          "confidence": 0.979854166507721,
+          "inference_time": 0.00838780403137207
+        },
+        {
+          "image": "floorplan_0162.jpg",
+          "prediction": "floorplan",
+          "confidence": 0.9848350286483765,
+          "inference_time": 0.006632804870605469
+        },
+        {
+          "image": "floorplan_0176.jpg",
+          "prediction": "floorplan",
+          "confidence": 0.974272608757019,
+          "inference_time": 0.006726980209350586
+        },
+        {
+          "image": "floorplan_0016.jpg",
+          "prediction": "floorplan",
+          "confidence": 0.9880486130714417,
+          "inference_time": 0.0065920352935791016
+        },
+        {
+          "image": "floorplan_0002.jpg",
+          "prediction": "floorplan",
+          "confidence": 0.9820667505264282,
+          "inference_time": 0.006748199462890625
+        },
+        {
+          "image": "floorplan_0003.jpg",
+          "prediction": "floorplan",
+          "confidence": 0.9767982959747314,
+          "inference_time": 0.006259918212890625
+        },
+        {
+          "image": "floorplan_0017.jpg",
+          "prediction": "floorplan",
+          "confidence": 0.9765390157699585,
+          "inference_time": 0.008205175399780273
+        },
+        {
+          "image": "floorplan_0177.jpg",
+          "prediction": "floorplan",
+          "confidence": 0.9708802103996277,
+          "inference_time": 0.007455348968505859
+        },
+        {
+          "image": "floorplan_0163.jpg",
+          "prediction": "floorplan",
+          "confidence": 0.9860252737998962,
+          "inference_time": 0.00793004035949707
+        },
+        {
+          "image": "floorplan_0188.jpg",
+          "prediction": "floorplan",
+          "confidence": 0.9842500686645508,
+          "inference_time": 0.00921773910522461
+        },
+        {
+          "image": "floorplan_0149.jpg",
+          "prediction": "floorplan",
+          "confidence": 0.978661060333252,
+          "inference_time": 0.006682157516479492
+        },
+        {
+          "image": "floorplan_0175.jpg",
+          "prediction": "floorplan",
+          "confidence": 0.9654185771942139,
+          "inference_time": 0.008648157119750977
+        },
+        {
+          "image": "floorplan_0161.jpg",
+          "prediction": "floorplan",
+          "confidence": 0.9901840090751648,
+          "inference_time": 0.006781101226806641
+        },
+        {
+          "image": "floorplan_0029.jpg",
+          "prediction": "floorplan",
+          "confidence": 0.978544294834137,
+          "inference_time": 0.00684809684753418
+        },
+        {
+          "image": "floorplan_0001.jpg",
+          "prediction": "floorplan",
+          "confidence": 0.986700177192688,
+          "inference_time": 0.006815910339355469
+        },
+        {
+          "image": "floorplan_0015.jpg",
+          "prediction": "floorplan",
+          "confidence": 0.9828045964241028,
+          "inference_time": 0.006796121597290039
+        },
+        {
+          "image": "floorplan_0014.jpg",
+          "prediction": "floorplan",
+          "confidence": 0.9851426482200623,
+          "inference_time": 0.006782054901123047
+        },
+        {
+          "image": "floorplan_0000.jpg",
+          "prediction": "floorplan",
+          "confidence": 0.9319393634796143,
+          "inference_time": 0.006588935852050781
+        },
+        {
+          "image": "floorplan_0028.jpg",
+          "prediction": "floorplan",
+          "confidence": 0.9799901843070984,
+          "inference_time": 0.006588935852050781
+        },
+        {
+          "image": "floorplan_0160.jpg",
+          "prediction": "floorplan",
+          "confidence": 0.9820583462715149,
+          "inference_time": 0.00643467903137207
+        }
+      ]
+    }
+  }
+}

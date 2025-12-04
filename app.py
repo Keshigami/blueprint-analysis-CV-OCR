@@ -17,11 +17,11 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'venv_py311/lib/pytho
 app = FastAPI(title="Blueprint Analysis API")
 
 # Mount static files
-app.mount("/static", StaticFiles(directory="blueprint_analysis/static"), name="static")
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 @app.get("/")
 async def read_index():
-    return FileResponse('blueprint_analysis/static/index.html')
+    return FileResponse('static/index.html')
 
 # Initialize models
 print("Initializing OCR models...")
@@ -179,8 +179,8 @@ async def analyze_complete(file: UploadFile = File(...)):
                     "bbox": [int(x) for x in m["bbox"]],
                     "predicted_iou": float(m["predicted_iou"])
                 } for m in seg_masks[:50]]
-            except:
-                pass
+            except Exception as seg_error:
+                print(f"SAM2 segmentation error: {seg_error}")
         
         # Cleanup
         os.remove(temp_path)
@@ -188,13 +188,22 @@ async def analyze_complete(file: UploadFile = File(...)):
         return {
             "status": "success",
             "ocr_results": ocr_results,
+            "segmentation": {
+                "num_masks": len(masks),
+                "masks": masks
+            }
         }
     except Exception as e:
-        return {"error": str(e)}
-    finally:
-        if os.path.exists(temp_file):
-            os.remove(temp_file)
-        # Keep processed file for inspection or remove it
+        # Cleanup on error
+        if os.path.exists(temp_path):
+            os.remove(temp_path)
+        return JSONResponse(
+            status_code=500,
+            content={"status": "error", "message": str(e)}
+        )
 
 if __name__ == "__main__":
+    print("Starting Blueprint Analysis API...")
+    print("OCR: Ready (Standard + Architectural)")
+    print("SAM2: Lazy loading (will load on first request)")
     uvicorn.run(app, host="0.0.0.0", port=8000)
